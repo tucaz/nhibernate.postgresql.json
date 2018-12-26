@@ -1,16 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Authors>tucaz</Authors>
     <Description>NHibernate CustomType to persist/load to JSON/JSONB column types in PostgreSql.
 
-Works with NHibernate 5.x.</Description>
-    <PackageProjectUrl>https://github.com/tucaz/nhibernate.postgresql.json</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/tucaz/nhibernate.postgresql.json</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>nhibernate json jsonb postgre postgresql customtype</PackageTags>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+Works with NHibernate 5.x.</Description>    
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>    
   </PropertyGroup>
 
   <ItemGroup>
