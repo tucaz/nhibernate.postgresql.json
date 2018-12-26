@@ -19,6 +19,10 @@ To install this download package `nhibernate.postgresql.json` or run:
 Install-Package nhibernate.postgresql.json
 ```
 
+## Compatibility
+
+This library has been tested with .NET Core 2.1 and NHibernate 5.x.
+
 # Configuration
 
 All this package does is offer an NHibernate custom type that you can use to handle json/jsonb PostgreSql data types. It relies on the configuration provided by NpgSql.Json.Net.
