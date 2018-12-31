@@ -43,6 +43,12 @@ After the configuration is complete, you can just use it in your mapping as a cu
 Map(x => x.PropertyWithMyType).CustomSqlType("jsonb").CustomType<JsonType<AnotherType>>().Column("db_column");
 ```
 
+It also works with native CLR types such as `Dictionary<string,string>` which is perfect to store unstructured data. In my particular case, I use it to store raw data from web requests along with parsed data.
+
+```csharp
+Map(x => x.Raw).CustomSqlType("jsonb").CustomType<JsonType<Dictionary<string,string>>>().Column("raw");
+```
+
 # Sample
 
 A more complete sample can be found below:
