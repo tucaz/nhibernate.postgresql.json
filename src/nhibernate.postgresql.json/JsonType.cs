@@ -4,86 +4,67 @@ using NHibernate.Type;
 using Npgsql;
 using NpgsqlTypes;
 using System;
+using System.Collections;
+using System.Data;
 using System.Data.Common;
+using NHibernate.SqlTypes;
+using NHibernate.UserTypes;
 
 namespace nhibernate.postgresql.json
 {
     [Serializable]
-    public class JsonType<TSerializable> : MutableType
+    public class JsonType<TSerializable> : IUserType where TSerializable : class
     {
-        private readonly Type serializableClass;
+        private readonly Type _serializableClass;
 
-        public JsonType() : base(new JsonSqlType())
+        public JsonType()
         {
-            serializableClass = typeof(TSerializable);
+            _serializableClass = typeof(TSerializable);
         }
 
-        public override void Set(DbCommand cmd, object value, int index, ISessionImplementor session)
-        {
-            if (!(cmd is NpgsqlCommand))
-            {
-                throw new ArgumentOutOfRangeException(nameof(cmd), $"Can't handle cmd {cmd.GetType().ToString()}. This is only ready for \"NpgsqlCommand\".");
-            }
+//        public override void Set(DbCommand cmd, object value, int index, ISessionImplementor session)
+//        {
+//            if (!(cmd is NpgsqlCommand))
+//            {
+//                throw new ArgumentOutOfRangeException(nameof(cmd),
+//                    $"Can't handle cmd {cmd.GetType().ToString()}. This is only ready for \"NpgsqlCommand\".");
+//            }
+//
+//            var parameter = cmd.Parameters[index] as NpgsqlParameter;
+//            parameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
+//            parameter.Value = value;
+//        }
 
-            var parameter = cmd.Parameters[index] as NpgsqlParameter;
-            parameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
-            parameter.Value = value;
-        }
+//        public override object Get(DbDataReader rs, string name, ISessionImplementor session)
+//        {
+//            if (rs is NpgsqlDataReader)
+//            {
+//                var value = rs.GetFieldValue<TSerializable>(0);
+//                return value;
+//            }
+//
+//            throw new ArgumentOutOfRangeException(nameof(rs),
+//                $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
+//        }
+//
+//        public override object Get(DbDataReader rs, int index, ISessionImplementor session)
+//        {
+//            if (rs is NpgsqlDataReader)
+//            {
+//                var value = rs.GetFieldValue<TSerializable>(index);
+//                return value;
+//            }
+//            else if (rs is NHibernate.Driver.NHybridDataReader)
+//            {
+//                var value = rs.GetString(index);
+//                return Deserialize(value);
+//            }
+//
+//            throw new ArgumentOutOfRangeException(nameof(rs),
+//                $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
+//        }
 
-        public override object Get(DbDataReader rs, string name, ISessionImplementor session)
-        {
-            if (rs is NpgsqlDataReader)
-            {
-                var value = rs.GetFieldValue<TSerializable>(0);
-                return value;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(rs), $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
-        }
-
-        public override object Get(DbDataReader rs, int index, ISessionImplementor session)
-        {
-            if (rs is NpgsqlDataReader)
-            {
-                var value = rs.GetFieldValue<TSerializable>(0);
-                return value;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(rs), $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
-        }
-
-        public override Type ReturnedClass => serializableClass;
-
-        public override bool IsEqual(object x, object y)
-        {
-            if (ReferenceEquals(x, y))
-            {
-                return true;
-            }
-
-            if (x == null | y == null)
-            {
-                return false;
-            }
-
-            return x.Equals(y);
-        }
-
-        public override int GetHashCode(object x, ISessionFactoryImplementor factory)
-        {
-            return x.GetHashCode();
-        }
-
-        public static string Alias => string.Concat("json_", typeof(TSerializable).Name);
-
-        public override string Name => Alias;
-
-        public override object DeepCopyNotNull(object value)
-        {
-            return Deserialize(Serialize(value));
-        }
-
-        private string Serialize(object obj)
+        private static string Serialize(object obj)
         {
             try
             {
@@ -95,11 +76,11 @@ namespace nhibernate.postgresql.json
             }
         }
 
-        public object Deserialize(string dbValue)
+        private object Deserialize(string dbValue)
         {
             try
             {
-                return JsonConvert.DeserializeObject(dbValue, serializableClass);
+                return JsonConvert.DeserializeObject(dbValue, _serializableClass);
             }
             catch (Exception e)
             {
@@ -107,14 +88,128 @@ namespace nhibernate.postgresql.json
             }
         }
 
-        public override object Assemble(object cached, ISessionImplementor session, object owner)
+        public new bool Equals(object x, object y)
         {
-            return (cached == null) ? null : Deserialize((string)cached);
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+
+            if (x == null | y == null)
+            {
+                return false;
+            }
+
+            if (IsDictionary(x) && IsDictionary(y))
+            {
+                return EqualDictionary(x, y);
+            }
+
+            return x.Equals(y);
         }
 
-        public override object Disassemble(object value, ISessionImplementor session, object owner)
+        private static bool EqualDictionary(object x, object y)
+        {
+            var a = x as IDictionary;
+            var b = y as IDictionary;
+
+            if (a.Count != b.Count) return false;
+
+            foreach (var key in a.Keys)
+            {
+                if (!b.Contains(key)) return false;
+
+                var va = a[key];
+                var vb = b[key];
+
+                if (!va.Equals(vb)) return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsDictionary(object o)
+        {
+            return typeof(IDictionary).IsAssignableFrom(o.GetType());
+        }
+
+        public int GetHashCode(object x)
+        {
+            return x.GetHashCode();
+        }
+
+        public object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
+        {
+            if (names.Length != 1)
+                throw new InvalidOperationException($"One column name expected but received {names.Length}");
+
+            if (rs[names[0]] is string value && !string.IsNullOrWhiteSpace(value))
+                return Deserialize(value);
+
+            return null;
+        }
+
+        public void NullSafeSet(DbCommand cmd, object value, int index, ISessionImplementor session)
+        {
+            var parameter = cmd.Parameters[index];
+
+            if (parameter is NpgsqlParameter)
+                parameter.DbType = SqlTypes[0].DbType;
+
+            if (value == null)
+                parameter.Value = DBNull.Value;
+            else
+                parameter.Value = value;
+        }
+
+        public object DeepCopy(object value)
+        {
+            return Deserialize(Serialize(value));
+        }
+
+        public object Replace(object original, object target, object owner)
+        {
+            return original;
+        }
+
+        public object Assemble(object cached, object owner)
+        {
+            return (cached == null) ? null : Deserialize((string) cached);
+        }
+
+        public object Disassemble(object value)
         {
             return (value == null) ? null : Serialize(value);
+        }
+
+        public SqlType[] SqlTypes => new[] {new NpgsqlExtendedSqlType(DbType.Object, NpgsqlDbType.Jsonb)};
+        public Type ReturnedType => _serializableClass;
+        public bool IsMutable => true;
+    }
+
+    public class NpgsqlExtendedSqlType : SqlType
+    {
+        private readonly NpgsqlDbType _npgDbType;
+
+        public NpgsqlExtendedSqlType(DbType dbType, NpgsqlDbType npgDbType) : base(dbType)
+        {
+            _npgDbType = npgDbType;
+        }
+
+        public NpgsqlExtendedSqlType(DbType dbType, NpgsqlDbType npgDbType, int length) : base(dbType, length)
+        {
+            _npgDbType = npgDbType;
+        }
+
+        public NpgsqlExtendedSqlType(DbType dbType, NpgsqlDbType npgDbType, byte precision, byte scale) : base(dbType,
+            precision, scale)
+        {
+            _npgDbType = npgDbType;
+        }
+
+        public NpgsqlDbType NpgDbType
+        {
+            get { return _npgDbType; }
         }
     }
 }

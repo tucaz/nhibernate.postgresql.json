@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>nhibernate.postgresql.json</id>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <description>NHibernate CustomType to persist/load to JSON/JSONB column types in PostgreSql.
 
 Works with NHibernate 5.x. and .NET Core 2.1</description>
@@ -14,9 +14,6 @@ Works with NHibernate 5.x. and .NET Core 2.1</description>
 		<summary>NHibernate CustomType to persist/load to JSON/JSONB column types in PostgreSql</summary>
 		<tags>nhibernate json jsonb postgre postgresql customtype</tags>
 		<repository type="git" url="https://github.com/tucaz/nhibernate.postgresql.json" />
-		<packageTypes>
-			<packageType name="Dependency" />
-		</packageTypes>		
 		<dependencies>
 			<dependency id="NHibernate" version="5.2.1" />
 			<dependency id="Npgsql.Json.NET" version="4.0.4" />
