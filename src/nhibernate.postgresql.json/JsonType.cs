@@ -22,48 +22,6 @@ namespace nhibernate.postgresql.json
             _serializableClass = typeof(TSerializable);
         }
 
-//        public override void Set(DbCommand cmd, object value, int index, ISessionImplementor session)
-//        {
-//            if (!(cmd is NpgsqlCommand))
-//            {
-//                throw new ArgumentOutOfRangeException(nameof(cmd),
-//                    $"Can't handle cmd {cmd.GetType().ToString()}. This is only ready for \"NpgsqlCommand\".");
-//            }
-//
-//            var parameter = cmd.Parameters[index] as NpgsqlParameter;
-//            parameter.NpgsqlDbType = NpgsqlDbType.Jsonb;
-//            parameter.Value = value;
-//        }
-
-//        public override object Get(DbDataReader rs, string name, ISessionImplementor session)
-//        {
-//            if (rs is NpgsqlDataReader)
-//            {
-//                var value = rs.GetFieldValue<TSerializable>(0);
-//                return value;
-//            }
-//
-//            throw new ArgumentOutOfRangeException(nameof(rs),
-//                $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
-//        }
-//
-//        public override object Get(DbDataReader rs, int index, ISessionImplementor session)
-//        {
-//            if (rs is NpgsqlDataReader)
-//            {
-//                var value = rs.GetFieldValue<TSerializable>(index);
-//                return value;
-//            }
-//            else if (rs is NHibernate.Driver.NHybridDataReader)
-//            {
-//                var value = rs.GetString(index);
-//                return Deserialize(value);
-//            }
-//
-//            throw new ArgumentOutOfRangeException(nameof(rs),
-//                $"Can't handle DbDataReader {rs.GetType().ToString()}. This is only ready for \"NpgsqlDataReader\".");
-//        }
-
         private static string Serialize(object obj)
         {
             try
