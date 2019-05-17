@@ -1,0 +1,29 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+skip_non_tags: true
+configuration: Release
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+init:
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
+before_build:
+  # Display .NET Core version
+  - cmd: dotnet --version
+  # Display minimal restore text
+  - cmd: dotnet restore ./src/nhibernate.postgresql.json/nhibernate.postgresql.json.csproj --verbosity m
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+  use_snupkg_format: true
+  include_nuget_references: true
+  verbosity: minimal
+deploy:
+  provider: Environment
+  name: Nuget
