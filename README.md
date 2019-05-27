@@ -2,7 +2,9 @@
 
 # nhibernate.postgresql.json
 
-NHibernate custom type to handle PostgreSQL JSON and JSONB column types
+NHibernate custom type to handle PostgreSQL JSON and JSONB column types.
+
+As of June/2019 this repository is being actively maintained.
 
 # Installation
 
@@ -127,3 +129,12 @@ public class MyTypeMap : ClassMap<AnotherType>
 	}
 }
 ```
+
+# How to contribute / I want to help
+
+If you are interested in helping out there are a few things we could use:
+
+- [ ] Add tests to the project to make sure that this behaves as it should (so far I have been using it in a production app, but my use case is very simple and not comprehensive)
+- [ ] Add more examples
+
+If you feel like helping, just send a PR :)
