@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/qq2ldw5bfoe2f148?svg=true)](https://ci.appveyor.com/project/tucaz/nhibernate-postgresql-json)
+
 # nhibernate.postgresql.json
 
 NHibernate custom type to handle PostgreSQL JSON and JSONB column types
@@ -6,10 +8,12 @@ NHibernate custom type to handle PostgreSQL JSON and JSONB column types
 
 This library depends on the following NuGet packages:
 
-- [NHibernate](https://www.nuget.org/packages/NHibernate)
-- [NpgSql](https://www.nuget.org/packages/Npgsql/)
-- [NpgSql.Json.Net](https://www.nuget.org/packages/Npgsql.Json.NET/)
-- [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
+- Direct
+  - [NHibernate](https://www.nuget.org/packages/NHibernate)
+  - [NpgSql.Json.Net](https://www.nuget.org/packages/Npgsql.Json.NET/) 
+- Indirect
+  - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
+  - [NpgSql](https://www.nuget.org/packages/Npgsql/)
 
 These will be installed as dependencies along with this page.
 
