@@ -1,22 +1,51 @@
-version: 1.0.{build}
 image: Visual Studio 2019
 skip_non_tags: true
 configuration: Release
+init:
+  - cmd: git config --global core.autocrlf true
+  - ps: |
+      $build = $env:APPVEYOR_BUILD_NUMBER
+      $branch = $env:APPVEYOR_REPO_BRANCH
+      
+      if ($env:APPVEYOR_REPO_TAG -eq "true") {
+      	Add-AppveyorMessage -Message "Version: Using git tag $env:APPVEYOR_REPO_TAG_NAME"
+      
+      	if (-not $env:APPVEYOR_REPO_TAG_NAME -match "^(\d+\.\d+\.\d+)") {
+      		throw "Invalid version in tag name"
+      	}          
+      	
+      	$semver = $env:APPVEYOR_REPO_TAG_NAME
+      } 
+      else 
+      {
+      	$semver = (git describe --abbrev=0 2>&1);
+      	if ($LASTEXITCODE -ne 0) { 
+      		$semver = "1.1" 
+      	}
+      						  
+      	Add-AppveyorMessage -Message "Version: Using base semver $semver"
+      							  
+      	$semver -match "^(\d+\.\d+\.\d+)"
+      	$version = [version]$Matches[0]
+      	$semver += ".$build"
+      										  
+      	if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      		$semver += "+pr.$env:APPVEYOR_PULL_REQUEST_NUMBER"
+      	} 
+      }
+      
+      Add-AppveyorMessage -Message "Updating version to $semver"
+      Update-AppVeyorBuild -Version "$semver"
 dotnet_csproj:
   patch: true
-  file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
-init:
-  # Good practise, because Windows line endings are different from Unix/Linux ones
-  - cmd: git config --global core.autocrlf true
+  file: '**\*.csproj;**\**\*.csproj;**\**\**\*.csproj'
+  version: '$(APPVEYOR_BUILD_VERSION)'
+  package_version: $(APPVEYOR_BUILD_VERSION)
+  assembly_version: '$(APPVEYOR_BUILD_VERSION)'
+  file_version: '$(APPVEYOR_BUILD_VERSION)'
+  informational_version: '$(APPVEYOR_BUILD_VERSION)'
 before_build:
-  # Display .NET Core version
   - cmd: dotnet --version
-  # Display minimal restore text
   - cmd: dotnet restore ./src/nhibernate.postgresql.json/nhibernate.postgresql.json.csproj --verbosity m
 build:
   publish_nuget: true
@@ -27,3 +56,5 @@ build:
 deploy:
   provider: Environment
   name: Nuget
+  on:
+    APPVEYOR_REPO_TAG: true
