@@ -6,7 +6,7 @@
 
 Works with NHibernate 5.x.</Description>    
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>    
-    <TargetFrameworks>netcoreapp2.1;netcoreapp2.2</TargetFrameworks>    
+    <TargetFrameworks>netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netstandard2.0</TargetFrameworks>    
     <PackageLicenseExpression>MIT</PackageLicenseExpression>    
     <PackageProjectUrl>https://github.com/tucaz/nhibernate.postgresql.json</PackageProjectUrl>    
     <RepositoryUrl>https://github.com/tucaz/nhibernate.postgresql.json</RepositoryUrl>    
