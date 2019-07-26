@@ -47,7 +47,7 @@ dotnet_csproj:
 before_build:
   - cmd: dotnet --version
   - cmd: dotnet restore ./src/nhibernate.postgresql.json/nhibernate.postgresql.json.csproj --verbosity m
-  - cmd: dotnet restore ./src/nhibernate.postgresql.json/nhibernate.postgresql.json.tests.csproj --verbosity m
+  - cmd: dotnet restore ./src/nhibernate.postgresql.json.tests/nhibernate.postgresql.json.tests.csproj --verbosity m
 build:
   publish_nuget: true
   publish_nuget_symbols: true
