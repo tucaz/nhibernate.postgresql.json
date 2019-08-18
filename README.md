@@ -125,7 +125,7 @@ public class MyTypeMap : ClassMap<AnotherType>
 
 		Map(x => x.Name).Column("name");
 		Map(x => x.Age).Column("age");
-		Map(x => x.Other).CustomSqlType("jsonb").CustomType<JsonType<Transaction>>().Column("other").Not.Nullable();
+		Map(x => x.Other).CustomSqlType("jsonb").CustomType<JsonType<AnotherType>>().Column("other").Not.Nullable();
 	}
 }
 ```
